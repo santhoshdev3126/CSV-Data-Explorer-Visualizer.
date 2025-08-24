@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CSV Data Explorer & Visualizer</title>
+<link rel="icon" href="images/logo.png" />
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Papa Parse CDN -->
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+
+    /* Static background image for a good look */
+    background-image: url('images/p4.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+
+    /* Optional overlay for better text readability
+    background-color: rgba(255, 255, 255, 0.5);
+    background-blend-mode: lighten;
+    */
+  }
+
+  /* Custom styled label acting as a button for file input */
+  #file-label {
+    cursor: pointer;
+    font-size: 1.2em;
+    background: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    display: block;
+    margin: 20px auto;
+    width: fit-content;
+    text-align: center;
+  }
+
+  #file-input {
+    display: none;
+  }
+
+  #data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: rgba(244, 241, 241, 0.8);
+  }
+  #data-table th, #data-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+  }
+  .controls {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  #chartContainer {
+    width: 80%;
+    max-width: 800px;
+    margin: 30px auto;
+    background-color: rgba(237, 236, 236, 0.8);
+    padding: 10px;
+    border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+
+<h1 style="text-align: center;">CSV Data Explorer & Visualizer</h1>
+
+<!-- Custom file select label -->
+<label id="file-label" for="file-input">Select CSV File</label>
+<input type="file" id="file-input" accept=".csv" />
+
+<div id="table-container"></div>
+
+<div class="controls">
+  <label for="xSelect">X-axis:</label>
+  <select id="xSelect"></select>
+  <label for="ySelect">Y-axis:</label>
+  <select id="ySelect"></select>
+  <button id="updateChart">Update Chart</button>
+</div>
+
+<div id="chartContainer">
+  <canvas id="myChart"></canvas>
+</div>
+
+<script>
+  let csvData = [];
+  let headers = [];
+  let myChart;
+
+  document.getElementById('file-input').addEventListener('change', handleFileSelect);
+  document.getElementById('updateChart').addEventListener('click', updateChart);
+
+  function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: function(results) {
+        csvData = results.data;
+        headers = results.meta.fields;
+        displayTable(csvData);
+        populateDropdowns(headers);
+        createChart(); // initial empty chart
+      }
+    });
+  }
+
+  function displayTable(data) {
+    const container = document.getElementById('table-container');
+    let html = '<table id="data-table"><thead><tr>';
+
+    headers.forEach(header => {
+      html += `<th>${header}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+
+    data.forEach(row => {
+      html += '<tr>';
+      headers.forEach(header => {
+        html += `<td>${row[header]}</td>`;
+      });
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+
+    container.innerHTML = html;
+  }
+
+  function populateDropdowns(headers) {
+    const xSelect = document.getElementById('xSelect');
+    const ySelect = document.getElementById('ySelect');
+    xSelect.innerHTML = '';
+    ySelect.innerHTML = '';
+
+    headers.forEach(header => {
+      const option1 = document.createElement('option');
+      option1.value = header;
+      option1.text = header;
+      xSelect.appendChild(option1);
+
+      const option2 = document.createElement('option');
+      option2.value = header;
+      option2.text = header;
+      ySelect.appendChild(option2);
+    });
+  }
+
+  function createChart() {
+    const ctx = document.getElementById('myChart').getContext('2d');
+    if (myChart) myChart.destroy();
+
+    myChart = new Chart(ctx, {
+      type: 'scatter',
+      data: {
+        datasets: [{
+          label: 'Data points',
+          data: [], // empty initially
+          backgroundColor: 'rgba(255, 0, 0, 0.7)'
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: ''
+            }
+          },
+          y: {
+            title: {
+              display: true,
+              text: ''
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function updateChart() {
+    const xColumn = document.getElementById('xSelect').value;
+    const yColumn = document.getElementById('ySelect').value;
+
+    if (!xColumn || !yColumn) return;
+
+    const dataPoints = csvData.map(row => {
+      const x = parseFloat(row[xColumn]);
+      const y = parseFloat(row[yColumn]);
+      if (isNaN(x) || isNaN(y)) return null;
+      return { x: x, y: y };
+    }).filter(d => d !== null);
+
+    myChart.data.datasets[0].data = dataPoints;
+    myChart.options.scales.x.title.text = xColumn;
+    myChart.options.scales.y.title.text = yColumn;
+    myChart.update();
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CSV Data Explorer & Visualizer</title>
+<link rel="icon" href="images/logo.png" />
+<!-- Styles for layout and effects -->
+<style>
+  /* Reset default styles */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  /* Body setup: position relative for layering */
+body {
+  font-family: Arial, sans-serif;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  opacity: 0;
+  animation: fadeIn 2s forwards;
+}
+
+/* Slideshow background container */
+#slideshow-background {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: -3; /* Behind other content */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url('images/p3.png'); /* fallback */
+  animation: fadeSlide 25s infinite;
+}
+
+/* Keyframes for background slideshow */
+@keyframes fadeSlide {
+  0% { opacity: 1; background-image: url('images/P1.png'); }
+  20% { opacity: 1; background-image: url('images/p2.png'); }
+  40% { opacity: 1; background-image: url('images/p3.png'); }
+  60% { opacity: 1; background-image: url('images/logo.png'); }
+  80% { opacity: 1; background-image: url('images/P1.png'); }
+  100% { opacity: 1; background-image: url('images/P1.png'); }
+}   
+
+/* Overlay gradient for readability */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3));
+  z-index: -2;
+}
+
+/* Canvas for particles effect */
+#particles-js {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+}
+
+/* Main content styles */
+.content {
+  position: relative;
+  z-index: 1;
+  color: white;
+  text-align: center;
+  padding: 50px 20px;
+}
+
+h1 {
+  font-size: 3em;
+  margin-bottom: 20px;
+  animation: fadeIn 2s ease-in;
+}
+
+/* Buttons styling */
+a.button {
+  display: inline-block;
+  background-color: #008CBA;
+  border: none;
+  padding: 15px 30px;
+  font-size: 1.2em;
+  color: white;
+  cursor: pointer;
+  border-radius: 8px;
+  margin: 10px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+a.button:hover {
+  background-color: #005f73;
+  transform: scale(1.05);
+}
+
+/* Fade-in animation for body and headings */
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Background slideshow container -->
+<div id="slideshow-background"></div>
+
+<!-- Canvas for particles effect -->
+<div id="particles-js"></div>
+
+<!-- Main content -->
+<div class="content">
+  <h1>CSV Data Explorer & Visualizer</h1>
+  <p> It is a tool that allows users to easily browse, analyze, and create visual representations of data stored in CSV files.</p>
+  <!-- Buttons linking to new pages -->
+  <a href="index.html" class="button">Click Here</a>
+  <a href="about.html" class="button">About Us</a>
+</div>
+
+<!-- Removed control buttons for manual background change -->
+
+<!-- Particles.js library -->
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script>
+  // Initialize particles.js
+  particlesJS("particles-js", {
+    "particles": {
+      "number": {
+        "value": 80,
+        "density": {
+          "enable": true,
+          "value_area": 800
+        }
+      },
+      "color": { "value": "#ffffff" },
+      "shape": { "type": "circle" },
+      "opacity": {
+        "value": 0.5,
+        "random": true
+      },
+      "size": {
+        "value": 3,
+        "random": true
+      },
+      "move": {
+        "enable": true,
+        "speed": 2,
+        "direction": "none",
+        "random": true,
+        "straight": false,
+        "out_mode": "out"
+      }
+    },
+    "interactivity": {
+      "detect_on": "canvas",
+      "events": {
+        "onhover": {
+          "enable": true,
+          "mode": "repulse"
+        },
+        "onclick": {
+          "enable": true,
+          "mode": "push"
+        }
+      },
+      "modes": {
+        "repulse": {
+          "distance": 100,
+          "duration": 0.4
+        },
+        "push": {
+          "particles_nb": 4
+        }
+      }
+    },
+    "retina_detect": true
+  });
+
+  // JavaScript for background slideshow
+  const backgrounds = [
+    "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+    "https://images.unsplash.com/photo-1549887534-7c6808453d7b",
+    "https://images.unsplash.com/photo-1493612276216-ee3925520721",
+    "https://images.unsplash.com/photo-1523413651479-597eb2da0ad6",
+    "https://images.unsplash.com/photo-1549924231-f129b911e442"
+  ];
+
+  let currentBgIndex = 0;
+  const bgDiv = document.getElementById('slideshow-background');
+
+  // Function to change background
+  function changeBackground(index) {
+    bgDiv.style.backgroundImage = `url('${backgrounds[index]}')`;
+  }
+
+  // Initialize first background
+  changeBackground(currentBgIndex);
+
+  // Auto cycle backgrounds
+  setInterval(() => {
+    currentBgIndex = (currentBgIndex + 1) % backgrounds.length;
+    changeBackground(currentBgIndex);
+  }, 25000); // change every 25 seconds
+
+  // No manual buttons, so no event listeners for previous/next
+</script>
+</body>
+</html>
